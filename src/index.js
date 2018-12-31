@@ -1,35 +1,55 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
-import { getBoxStyle } from "./PythagorasTree.js";
+import { AnimatedPythagorasTree } from "./PythagorasTree.js";
+const createElement = React.createElement;
 
-// Don't set `totalLevels` above 8 -- your browser will
-// freeze due to the amount of work required.
-let totalLevels = 5;
-let heightFactor = 0.37;
-let lean = -0.1;
-let size = 100;
+function PythagorasTree({ sway, animating, onChangeSway, onToggle }) {
+  // Replace this with your solution
+  let toggleText = animating ? "Stop" : "START";
 
-const TreeBox = props => {
-  const style = getBoxStyle({
-    level: props.level,
-    right: props.right,
-    heightFactor,
-    lean,
-    size,
-    totalLevels
-  });
+  const increase = () => {
+    sway = parseFloat(sway) + 0.02;
+    onChangeSway(sway);
+  };
 
-  const rightChild =
-    props.level < totalLevels &&
-    React.createElement(TreeBox, {
-      right: true
-    });
+  const decrease = () => {
+    sway = parseFloat(sway) - 0.02;
+    onChangeSway(sway);
+  };
 
-  return React.createElement("div", { style }, rightChild);
-};
+  const handleChange = e => {
+    sway = e.target.value;
+    onChangeSway(sway);
+  };
 
-ReactDOM.render(
-  React.createElement(TreeBox, { level: 0 }),
-  document.getElementById("app")
-);
+  return createElement(
+    AnimatedPythagorasTree,
+    { animating, sway: !sway ? 0 : parseFloat(sway) },
+    createElement("button", { onClick: onToggle }, toggleText),
+    createElement("button", { onClick: decrease }, "<"),
+    createElement("input", { value: sway, onChange: e => handleChange(e) }),
+    createElement("button", { onClick: increase }, ">")
+  );
+}
+
+let animating = false;
+let sway = 0.1;
+function renderApp() {
+  ReactDOM.render(
+    createElement(PythagorasTree, {
+      animating,
+      sway,
+      onToggle: () => {
+        animating = !animating;
+        renderApp();
+      },
+      onChangeSway: value => {
+        sway = value;
+        renderApp();
+      }
+    }),
+    document.getElementById("app")
+  );
+}
+renderApp();

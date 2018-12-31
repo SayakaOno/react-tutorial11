@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
 /**
  * This file defines somes components that are used for the
  * demo in main.js. It is ok if you don't understand this,
